@@ -1,12 +1,13 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const chalk = require('chalk');
-const strip = require('strip-ansi');
+import fs from 'node:fs';
+import path from 'node:path';
+import chalk from 'chalk';
+import strip from 'strip-ansi';
+
 const isObject = function (value) {
   const type = typeof value;
-  return !!value && (type === 'object' || type === 'function');
+  return (!!value) && ((type === 'object') || (type === 'function'));
 };
 
 const isArray = Array.isArray;
@@ -19,7 +20,7 @@ const util = {
       let stat;
       try {
         stat = fs.statSync(filePath);
-        if (stat.isFile() || stat.isDirectory()) {
+        if ((stat.isFile()) || (stat.isDirectory())) {
           callback(filePath, stat);
         }
       } catch (e) {
@@ -95,13 +96,12 @@ const util = {
 const ls = {
 
   exec(paths, options) {
-    const self = this;
     paths = paths || ['.'];
-    paths = (!isArray(paths)) ? [paths] : paths;
+    paths = (!isArray(paths)) ? [ paths ] : paths;
     options = options || {};
     try {
       const results = [];
-      for (let i = 0; i < paths.length; ++i) {
+      for (let i = 0, l = paths.length; i < l; i++) {
         const result = ls.execDir(paths[i], options);
         results.push(result);
       }
@@ -109,12 +109,11 @@ const ls = {
       return stdout;
     } catch (e) {
       /* istanbul ignore next */
-      return ls.error.call(self, e);
+      return ls.error.call(this, e);
     }
   },
 
   error(e) {
-    /* istanbul ignore next */
     return e;
   },
 
@@ -201,7 +200,6 @@ const ls = {
 };
 
 function Exp(options) {
-  const self = this;
   this.options = options;
 
   this.data = function (string) {
@@ -213,7 +211,7 @@ function Exp(options) {
       almostall: true,
       classify: true
     };
-    if (self.options && self.options.directory === true) {
+    if ((this.options) && (this.options.directory === true)) {
       opts.directory = true;
     }
     const res = ls.exec.call(this, [prefix], opts);
@@ -227,7 +225,7 @@ function Exp(options) {
   this.exec = ls.exec;
 }
 
-module.exports = function (options) {
+export default function (options) {
   options = options || {};
   const obj = new Exp(options);
   return obj;

@@ -1,57 +1,61 @@
 'use strict';
 
-var $ = require('shelljs')
-var fs = require('fs-extra')
+import $ from 'shelljs';
+import fs from 'fs-extra';
+import path from 'node:path';
 
-module.exports = {
+const __dirname = path.dirname((new URL(import.meta.url)).pathname);
 
-	writeSampleDir: function(cb) {
+export default {
 
-		// If tests fail mid, script cleanup doesn't happen.
-		// This makes sure we are in the right dir before 
-		// trying to write.
-		if (String(process.cwd()).indexOf('/cash') === -1) {
-			process.chdir(__dirname + '/../..');
-		}
+  writeSampleDir: function(cb) {
 
-		fs.removeSync('./testing');
+    // If tests fail mid, script cleanup doesn't happen.
+    // This makes sure we are in the right dir before
+    // trying to write.
+    if (String(process.cwd()).indexOf('/cash') === -1) {
+      process.chdir(__dirname + '/../..');
+    }
 
-		$.mkdir('-p', './testing/');
-		$.mkdir('-p', './testing/sub/');
+    fs.removeSync('./testing');
 
-		var filler = "fill|";
+    $.mkdir('-p', './testing/');
+    $.mkdir('-p', './testing/sub/');
 
-		function writeDir(dir, cbk) {
-			var files = ['a.txt', 'c.exe', 'd.json', 'e.gif', 'b.tgz', 'f.jpg', 'g', '.hidden'];
-			function write() {
-				var next = files.shift();
-				if (next) {
-					filler = double(filler);
-					filler.to(dir + next);
-					setTimeout(function(){
-						write();
-					}, 10)
-				} else {
-					cbk();
-				}
-			}
-			write();
-		}
+    let filler = "fill|";
 
-		writeDir('./testing/', function(){
-			writeDir('./testing/sub/', function() {
-				cb();
-			});
-		})
-	},
+    function writeDir(dir, cbk) {
+      const files = [ 'a.txt', 'c.exe', 'd.json', 'e.gif', 'b.tgz', 'f.jpg', 'g', '.hidden' ];
+      function write() {
+        const next = files.shift();
+        if (next) {
+          filler = double(filler);
+          fs.writeFileSync(dir + next, filler);
+          //filler.to(dir + next);
+          setTimeout(() => {
+            write();
+          }, 10)
+        } else {
+          cbk();
+        }
+      }
+      write();
+    }
 
-	deleteSampleDir: function() {
-		fs.removeSync('./testing');
-	}
+    writeDir('./testing/', () => {
+      writeDir('./testing/sub/', () => {
+        cb();
+      });
+    })
+  },
+
+  deleteSampleDir: () => {
+    fs.removeSync('./testing');
+  }
 
 }
 
 function double(str) {
-	return str + str + str.slice(0, 100);
+  return str + str + str.slice(0, 100);
 }
 

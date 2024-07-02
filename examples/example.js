@@ -1,8 +1,10 @@
 'use strict';
 
-const vorpal = require('vorpal')();
-const grep = require('./../dist/grep');
-const chalk = require('chalk');
+import Vorpal from '@ApeironTsuka/vorpal';
+import grep from '../src/grep.js';
+import chalk from 'chalk';
+
+const vorpal = new Vorpal();
 
 vorpal
   .delimiter(`${chalk.grey(`${chalk.blue(`grep example`)}:`)}`)

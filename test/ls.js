@@ -1,11 +1,13 @@
-var assert = require("assert");
-var should = require('should');
-var strip = require('strip-ansi');
-var util = require('./util/util');
-var ls = require('./../dist/index')()
-var os = require('os');
+import assert from 'assert';
+import should from 'should';
+import strip from 'strip-ansi';
+import util from './util/util.js';
+import _ls from '../src/index.js';
+import os from 'node:os';
 
-var expected = {
+const ls = _ls();
+
+const expected = {
   rootDirFlat: 'a.txt  b.tgz  c.exe  d.json  e.gif  f.jpg  g  sub\n',
   rootDirFlatAll: '.  ..  a.txt  b.tgz  c.exe  d.json  e.gif  f.jpg  g  .hidden  sub\n',
   rootDirFlatHidden: 'a.txt  b.tgz  c.exe  d.json  e.gif  f.jpg  g  .hidden  sub\n',
@@ -17,66 +19,64 @@ var expected = {
   subDirFlat: 'a.txt  b.tgz  c.exe  d.json  e.gif  f.jpg  g\n'
 }
 
-describe('ls', function() {
+describe('ls', () => {
 
-  before(function(done) {
-    util.writeSampleDir(function() {
+  before((done) => {
+    util.writeSampleDir(() => {
       process.chdir('./testing/');
       done();
     });
   });
 
-  after(function() {
+  after(() => {
     process.chdir('..');
     util.deleteSampleDir();
   });
 
-  describe('directory listings', function(){
+  describe('directory listings', () => {
 
-    it('should exist', function() {
+    it('should exist', () => {
       should.exist(ls);
     });
 
-    it('should have an exec function', function() {
+    it('should have an exec function', () => {
       should.exist(ls.exec);
     });
 
-    it('should list current dir as default', function() {
-      var res = ls.exec();
+    it('should list current dir as default', () => {
+      const res = ls.exec();
       strip(res.join('  ') + '\n').should.equal(expected.rootDirFlat);
     });
 
-    it('should list a sub directory', function() {
-      var res = ls.exec('./sub');
+    it('should list a sub directory', () => {
+      const res = ls.exec('./sub');
       strip(res.join('  ') + '\n').should.equal(expected.subDirFlat);
     });
 
-    it('should list a parent directory', function() {
+    it('should list a parent directory', () => {
       process.chdir('./sub/');
-      var res = ls.exec('..');
+      const res = ls.exec('..');
       strip(res.join('  ') + '\n').should.equal(expected.rootDirFlat);
       process.chdir('..');
     });
 
   });
 
-  describe('file display', function(){
+  describe('file display', () => {
 
-    it('should list hidden files with --almost-all', function() {
-      var res = ls.exec('.', { almostall: true });
+    it('should list hidden files with --almost-all', () => {
+      const res = ls.exec('.', { almostall: true });
       strip(res.join('  ') + '\n').should.equal(expected.rootDirFlatHidden);
     });
 
-    it('should list hidden and implied files with --all', function() {
-      var res = ls.exec('.', { all: true });
+    it('should list hidden and implied files with --all', () => {
+      const res = ls.exec('.', { all: true });
       strip(res.join('  ') + '\n').should.equal(expected.rootDirFlatAll);
     });
 
-    it('should list append "/" to folders with --classify', function() {
-      var res = ls.exec('.', { classify: true });
+    it('should list append "/" to folders with --classify', () => {
+      const res = ls.exec('.', { classify: true });
       strip(res.join('  ') + '\n').should.equal(expected.rootDirFlatClassified);
     });
-
   });
-
 });
